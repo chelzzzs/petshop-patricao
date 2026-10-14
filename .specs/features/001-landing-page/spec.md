@@ -36,7 +36,7 @@ Tamanho: **Medium** · Status: aprovada (2026-10-14) — esboço inicial, iterat
 | FR-007 | **CTA final** + **footer** (redes, © ano automático). |
 | FR-008 | **Parallax scrolling**: camadas com velocidades diferentes (hero, cards, galeria, sobre, CTA). |
 | FR-009 | Links WhatsApp com mensagem pré-preenchida (`wa.me`). |
-| FR-010 | Todo conteúdo em `src/data/site.ts`, tipado. |
+| FR-010 | Todo conteúdo em `src/data/site.ts`, tipado; contatos reais via variáveis de ambiente (`astro:env`). |
 | FR-011 | Preview local configurado (`.claude/launch.json` + `npm run dev`). |
 | FR-012 | **Mascote interativo** (SVG + motion): olhos e cabeça seguem o cursor, piscam; clique na cabeça = carinho (orelhas + corações); segurar o focinho = cara feliz + corações. |
 

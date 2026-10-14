@@ -30,7 +30,7 @@ const title = `${site.name} · Pet Shop`;
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={site.description} />
-    <meta property="og:image" content={ogImage.src} />
+    <meta property="og:image" content={new URL(ogImage.src, Astro.site).href} />
     <meta property="og:locale" content="pt_BR" />
 
     <link rel="preconnect" href="https://images.unsplash.com" />

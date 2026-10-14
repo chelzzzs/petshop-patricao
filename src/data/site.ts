@@ -1,4 +1,12 @@
-// PLACEHOLDER: dados inventados para o esboço — trocar pelos reais antes de publicar.
+// Textos e fotos da página. Contatos reais (WhatsApp, telefone, Instagram, endereço) vêm do .env —
+// veja .env.example; ausentes ou vazias, valem os placeholders abaixo.
+import {
+  PETSHOP_ADDRESS_DISTRICT,
+  PETSHOP_ADDRESS_LINE,
+  PETSHOP_INSTAGRAM,
+  PETSHOP_PHONE,
+  PETSHOP_WHATSAPP,
+} from 'astro:env/server';
 
 export type Img = { src: string; srcset: string };
 
@@ -29,15 +37,15 @@ export const site = {
     'PatriCão Pet Shop: rações, petiscos, brinquedos e acessórios para cães e gatos. Peça pelo WhatsApp.',
 
   whatsapp: {
-    number: '5511900000000', // PLACEHOLDER
+    number: (PETSHOP_WHATSAPP || '5511900000000').replace(/\D/g, ''), // placeholder
     message: 'Oi, PatriCão! Quero saber dos produtos 🐾',
   },
-  phone: '+55 11 90000-0000', // PLACEHOLDER
-  instagram: 'patricao.petshop', // PLACEHOLDER
+  phone: PETSHOP_PHONE || '+55 11 90000-0000', // placeholder
+  instagram: (PETSHOP_INSTAGRAM || 'patricao.petshop').replace(/^@/, ''), // placeholder
 
   address: {
-    line: 'Rua dos Latidos, 123', // PLACEHOLDER
-    district: 'Vila Feliz · São Paulo',
+    line: PETSHOP_ADDRESS_LINE || 'Rua dos Latidos, 123', // placeholder
+    district: PETSHOP_ADDRESS_DISTRICT || 'Vila Feliz · São Paulo', // placeholder
   },
 
   hours: [

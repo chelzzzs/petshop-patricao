@@ -16,6 +16,8 @@ Feature 001-landing-page: esboço inicial implementado, aguardando ajustes do us
 - 2026-10-14: testado parallax via CSS Scroll-driven Animations e revertido a pedido; mantido o parallax em JS (motion `scroll`).
 - 2026-10-14: Constitution v2.0.0, motion design permitido (P4) e regra clean/direto (P7).
 
+- 2026-10-14: deploy no GitHub Pages via Actions (`.github/workflows/deploy.yml`), `base: /petshop-patricao`; contatos via repo Variables.
+- 2026-10-14: contatos (WhatsApp, telefone, Instagram, endereço) movidos para variáveis de ambiente via `astro:env` (.env fora do git, .env.example versionado); README do projeto escrito.
 - 2026-10-14: otimização de performance — shader em resolução reduzida (0.5 desktop / 0.3 mobile) a 30 fps, 4 octaves, pausa fora da tela/aba; sem blur animado; logo via astro:assets; fontes self-hosted (@fontsource); srcset nas fotos; mascote e parallax limitados a 1 atualização por quadro.
 
 ## Lições
