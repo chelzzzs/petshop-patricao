@@ -1,0 +1,61 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import logo from '../assets/logo.webp';
+import { site, whatsappLink } from '../data/site';
+
+const links = [
+  { href: '#produtos', label: 'Produtos' },
+  { href: '#sobre', label: 'Sobre' },
+  { href: '#visite', label: 'Visite' },
+];
+---
+
+<header
+  data-header
+  class="fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow] duration-500 data-[scrolled]:bg-cream/95 data-[scrolled]:shadow-[0_8px_30px_-12px_rgb(20_18_16/0.25)] md:data-[scrolled]:bg-cream/85 md:data-[scrolled]:backdrop-blur-md"
+>
+  <nav class="mx-auto flex h-18 max-w-6xl items-center justify-between px-4 sm:px-6">
+    <a href="#topo" class="group flex items-center gap-2.5" aria-label={`${site.name} — início`}>
+      <span class="grid size-11 place-items-center overflow-hidden rounded-full bg-white ring-2 ring-ink transition-transform duration-500 ease-(--ease-spring) group-hover:rotate-[-10deg] group-hover:scale-110">
+        <Image src={logo} alt="" width={88} height={88} densities={[1]} loading="eager" class="size-full object-cover" />
+      </span>
+      <span class="font-display text-xl font-bold tracking-tight">{site.name}</span>
+    </a>
+
+    <ul class="hidden items-center gap-8 font-display font-medium md:flex">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} class="relative py-1 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-300 hover:after:scale-x-100">
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex items-center gap-2">
+      <a href={whatsappLink()} target="_blank" rel="noopener" class="btn hidden bg-ink py-2.5 text-cream sm:inline-flex">
+        <Icon name="MessageCircle" class="size-4" /> Pedir
+      </a>
+      <button popovertarget="menu" class="grid size-11 place-items-center rounded-full bg-ink text-cream md:hidden" aria-label="Abrir menu">
+        <Icon name="Menu" />
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div id="menu" popover class="pop m-0 h-dvh max-h-none w-full max-w-none bg-sun p-6 text-ink">
+  <div class="flex justify-end">
+    <button popovertarget="menu" popovertargetaction="hide" class="grid size-11 place-items-center rounded-full bg-ink text-cream" aria-label="Fechar menu">
+      <Icon name="X" />
+    </button>
+  </div>
+  <ul class="mt-10 space-y-4 font-display text-5xl font-bold">
+    {links.map((l) => (
+      <li><a href={l.href} data-close-menu>{l.label}</a></li>
+    ))}
+  </ul>
+  <a href={whatsappLink()} target="_blank" rel="noopener" class="btn mt-12 bg-ink text-cream">
+    <Icon name="MessageCircle" class="size-4" /> Pedir pelo WhatsApp
+  </a>
+</div>

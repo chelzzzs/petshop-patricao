@@ -1,0 +1,15 @@
+---
+import * as icons from 'lucide-static';
+
+interface Props {
+  name: string;
+  class?: string;
+}
+
+const { name, class: className = 'size-5' } = Astro.props;
+const svg = (icons as Record<string, string>)[name];
+if (!svg) throw new Error(`Ícone desconhecido: ${name}`);
+const html = svg.replace('class="lucide', `aria-hidden="true" class="${className} lucide`);
+---
+
+<Fragment set:html={html} />

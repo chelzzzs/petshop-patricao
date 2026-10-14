@@ -1,0 +1,17 @@
+---
+import { site } from '../data/site';
+
+const tilt = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3'];
+---
+
+<section aria-label="Galeria" class="marquee overflow-hidden py-10">
+  <div data-speed-x style="--speed-x:-0.35" class="-ml-48">
+  <ul class="marquee-track flex w-max gap-6 px-3">
+    {[...site.gallery, ...site.gallery].map((p, i) => (
+      <li class={`${tilt[i % tilt.length]} shrink-0 transition-transform duration-500 ease-(--ease-spring) hover:z-10 hover:scale-110 hover:rotate-0`} aria-hidden={i >= site.gallery.length ? 'true' : undefined}>
+        <img src={p.image.src} srcset={p.image.srcset} sizes="(min-width: 640px) 256px, 208px" alt={i >= site.gallery.length ? '' : p.alt} width="500" height="640" loading="lazy" decoding="async" class="h-64 w-52 rounded-3xl object-cover shadow-xl sm:h-80 sm:w-64" />
+      </li>
+    ))}
+  </ul>
+  </div>
+</section>

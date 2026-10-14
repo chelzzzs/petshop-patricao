@@ -1,0 +1,30 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import logo from '../assets/logo.webp';
+import { site, whatsappLink } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<section class="px-4 pb-6 sm:px-6">
+  <div data-reveal class="mx-auto flex max-w-6xl flex-col items-center gap-6 rounded-[2.5rem] bg-sun px-6 py-16 text-center sm:py-20">
+    <Image data-speed style="--speed:-0.15" src={logo} alt="" width={192} height={192} loading="lazy" class="size-24 rounded-full bg-white object-cover ring-4 ring-ink" />
+    <h2 class="font-display text-4xl font-bold tracking-tight text-balance sm:text-6xl">Bora mimar seu patrão?</h2>
+    <a href={whatsappLink()} target="_blank" rel="noopener" class="btn bg-ink px-8 py-4 text-lg text-cream">
+      <Icon name="MessageCircle" /> Chamar no WhatsApp
+    </a>
+  </div>
+</section>
+
+<footer class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-ink-soft sm:flex-row sm:px-6">
+  <p>© {year} {site.name} · Fotos: <a href="https://unsplash.com" class="underline" target="_blank" rel="noopener">Unsplash</a></p>
+  <div class="flex items-center gap-2">
+    <a href={`https://instagram.com/${site.instagram}`} target="_blank" rel="noopener" class="grid size-10 place-items-center rounded-full ring-1 ring-ink/20 transition hover:bg-ink hover:text-cream" aria-label="Instagram">
+      <Icon name="Camera" class="size-4" />
+    </a>
+    <a href={`tel:${site.phone.replace(/\D/g, '')}`} class="grid size-10 place-items-center rounded-full ring-1 ring-ink/20 transition hover:bg-ink hover:text-cream" aria-label={`Ligar para ${site.phone}`}>
+      <Icon name="Phone" class="size-4" />
+    </a>
+  </div>
+</footer>

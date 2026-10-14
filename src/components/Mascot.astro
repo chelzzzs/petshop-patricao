@@ -1,0 +1,77 @@
+---
+// Mascote interativo do PatriCão em SVG por camadas.
+// Olhos seguem o cursor · clique na cabeça = carinho · segure no focinho = feliz.
+const fur = '#1d1a18';
+const furLight = '#2c2724';
+const line = '#0b0a09';
+
+const eyes = [
+  { id: 'l', cx: 160, cy: 168 },
+  { id: 'r', cx: 240, cy: 168 },
+];
+---
+
+<div class="mascot relative select-none" data-mascot>
+  <svg viewBox="0 0 400 400" class="size-full overflow-visible" role="img" aria-label="PatriCão, o mascote: um filhote preto. Clique na cabeça ou segure no focinho.">
+    <defs>
+      <path id="heart" d="M0 -4C-6 -14 -20 -6 -12 6L0 16L12 6C20 -6 6 -14 0 -4Z" />
+    </defs>
+
+    <!-- corpo (respiração) -->
+    <g data-body style="transform-box:fill-box;transform-origin:50% 100%">
+      <path d={`M112 400C112 318 156 280 200 280S288 318 288 400Z`} fill={fur} />
+      <path d="M170 300Q200 318 230 300" fill="none" stroke={line} stroke-width="3" opacity=".35" stroke-linecap="round" />
+    </g>
+
+    <!-- cabeça -->
+    <g data-head class="cursor-pointer" style="transform-box:fill-box;transform-origin:50% 90%">
+      <g data-ear="l" style="transform-box:fill-box;transform-origin:80% 0%">
+        <path d="M132 104C88 108 64 170 78 226C86 256 116 256 126 232L146 132Z" fill={fur} />
+        <path d="M120 140C100 160 92 196 96 220" fill="none" stroke={furLight} stroke-width="6" stroke-linecap="round" />
+      </g>
+      <g data-ear="r" style="transform-box:fill-box;transform-origin:20% 0%">
+        <path d="M268 104C312 108 336 170 322 226C314 256 284 256 274 232L254 132Z" fill={fur} />
+        <path d="M280 140C300 160 308 196 304 220" fill="none" stroke={furLight} stroke-width="6" stroke-linecap="round" />
+      </g>
+
+      <path data-pat d="M200 78C262 78 300 120 298 176C296 236 254 272 200 272S104 236 102 176C100 120 138 78 200 78Z" fill={fur} />
+      <path d="M176 82L184 66L192 80L200 62L208 80L218 68L222 84Z" fill={fur} />
+
+      {eyes.map((e) => (
+        <g>
+          <ellipse cx={e.cx} cy={e.cy} rx="30" ry="32" fill="#4a3a31" />
+          <g data-eye style="transform-box:fill-box;transform-origin:50% 50%">
+            <circle cx={e.cx} cy={e.cy} r="23" fill={line} />
+            <circle cx={e.cx - 8} cy={e.cy - 9} r="8" fill="#fff" />
+            <circle cx={e.cx + 7} cy={e.cy + 7} r="3.5" fill="#fff" opacity=".8" />
+          </g>
+          <ellipse data-lid cx={e.cx} cy={e.cy} rx="32" ry="34" fill={fur} style="transform-box:fill-box;transform-origin:50% 0%;transform:scaleY(0)" />
+          <path data-happy d={`M${e.cx - 16} ${e.cy + 4}Q${e.cx} ${e.cy - 16} ${e.cx + 16} ${e.cy + 4}`} fill="none" stroke="#4a3a31" stroke-width="7" stroke-linecap="round" opacity="0" />
+        </g>
+      ))}
+
+      <ellipse data-blush cx="140" cy="214" rx="16" ry="9" fill="#ff8a7a" opacity="0" />
+      <ellipse data-blush cx="260" cy="214" rx="16" ry="9" fill="#ff8a7a" opacity="0" />
+
+      <g data-chin class="cursor-grab">
+        <ellipse cx="200" cy="222" rx="52" ry="38" fill={furLight} />
+        <path d="M182 200Q200 188 218 200Q216 216 200 218Q184 216 182 200Z" fill={line} />
+        <ellipse cx="194" cy="198" rx="6" ry="3" fill="#5b524c" />
+        <path data-tongue d="M192 234Q200 254 208 234Z" fill="#ff7a8a" opacity="0" />
+        <path d="M200 218V228M200 228Q188 240 176 230M200 228Q212 240 224 230" fill="none" stroke={line} stroke-width="4" stroke-linecap="round" />
+      </g>
+    </g>
+
+    <!-- dicas (por cima de tudo, setas param antes do pelo) -->
+    <g data-hints class="font-display" fill="currentColor">
+      <text x="42" y="58" font-size="22" font-weight="600" transform="rotate(-8 42 58)">Clique</text>
+      <path d="M70 70 Q76 94 100 97" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M90 90 L101 97 L90 104" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="16" y="300" font-size="22" font-weight="600" transform="rotate(6 16 300)">Segure</text>
+      <path d="M42 280 Q46 256 66 245" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M54 243 L67 244 L62 256" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <g data-fx></g>
+  </svg>
+</div>
