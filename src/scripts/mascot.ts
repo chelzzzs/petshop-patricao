@@ -22,6 +22,7 @@ export function mountMascot(root: HTMLElement) {
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let isHappy = false;
+  let smiling = false;
 
   // Olhos e cabeça seguem o cursor
   // No máximo uma atualização por quadro, e só enquanto o mascote está na tela
@@ -51,7 +52,7 @@ export function mountMascot(root: HTMLElement) {
 
   // Piscar
   const blink = () => {
-    if (!isHappy) lids.forEach((l) => animate(l, { scaleY: [0, 1, 0] }, { duration: 0.22, ease: 'easeInOut' }));
+    if (!isHappy && !smiling) lids.forEach((l) => animate(l, { scaleY: [0, 1, 0] }, { duration: 0.22, ease: 'easeInOut' }));
     setTimeout(blink, 2500 + Math.random() * 3000);
   };
 
@@ -88,17 +89,41 @@ export function mountMascot(root: HTMLElement) {
     dismissHints();
     animate(head, { rotate: [0, -8, 7, -4, 0], scaleY: [1, 0.92, 1.04, 1] }, { duration: 0.6 });
     ears.forEach((ear, i) => animate(ear, { rotate: i ? [0, 28, -8, 0] : [0, -28, 8, 0] }, { duration: 0.7 }));
-    lids.forEach((l) => animate(l, { scaleY: [0, 1, 1, 0] }, { duration: 0.6 }));
-    for (let i = 0; i < 4; i++) setTimeout(() => heart(170 + Math.random() * 60, 70), i * 90);
+    smile();
   });
+
+  // Sorriso rápido: olhinhos fechados em "^ ^", bochechas coradas e linguinha, depois volta ao normal
+  let smileTimer = 0;
+  const smile = () => {
+    if (isHappy) return;
+    clearTimeout(smileTimer);
+    smiling = true;
+    eyes.forEach((el) => animate(el, { x: 0, y: 0 }, { duration: 0.15 }));
+    lids.forEach((l) => animate(l, { scaleY: 1 }, { duration: 0.15 }));
+    happy.forEach((h) => animate(h, { opacity: 1 }, { duration: 0.15, delay: 0.05 }));
+    blush.forEach((b) => animate(b, { opacity: 0.85 }, { duration: 0.25 }));
+    animate(tongue, { opacity: 1 }, { duration: 0.2 });
+    smileTimer = window.setTimeout(() => {
+      if (isHappy) return;
+      // Primeiro some o "^ ^", só depois a pálpebra abre — nunca os dois olhos aparecem juntos
+      happy.forEach((h) => animate(h, { opacity: 0 }, { duration: 0.12 }));
+      lids.forEach((l) => animate(l, { scaleY: 0 }, { duration: 0.22, delay: 0.12 }));
+      blush.forEach((b) => animate(b, { opacity: 0 }, { duration: 0.4 }));
+      animate(tongue, { opacity: 0 }, { duration: 0.2 });
+      window.setTimeout(() => (smiling = false), 360);
+    }, 1100);
+  };
 
   // Segurar no focinho = feliz
   let pump: ReturnType<typeof animate> | null = null;
   let heartsTimer = 0;
   const setHappy = (on: boolean) => {
+    clearTimeout(smileTimer);
+    smiling = false;
     isHappy = on;
-    lids.forEach((l) => animate(l, { scaleY: on ? 1 : 0 }, { duration: 0.2 }));
-    happy.forEach((h) => animate(h, { opacity: on ? 1 : 0 }, { duration: 0.2, delay: on ? 0.1 : 0 }));
+    // Fechando: pálpebra desce e depois aparece o "^ ^". Abrindo: o inverso.
+    lids.forEach((l) => animate(l, { scaleY: on ? 1 : 0 }, { duration: 0.2, delay: on ? 0 : 0.12 }));
+    happy.forEach((h) => animate(h, { opacity: on ? 1 : 0 }, { duration: on ? 0.2 : 0.12, delay: on ? 0.1 : 0 }));
     blush.forEach((b) => animate(b, { opacity: on ? 0.85 : 0 }, { duration: 0.3 }));
     animate(tongue, { opacity: on ? 1 : 0 }, { duration: 0.2 });
     if (on) {
@@ -127,6 +152,30 @@ export function mountMascot(root: HTMLElement) {
   };
   chin.addEventListener('pointerup', release);
   chin.addEventListener('pointercancel', release);
+
+  // Mouse sobre os botões do topo: ele mostra a linguinha (e ela balança enquanto o mouse estiver lá)
+  let tongueWiggle: ReturnType<typeof animate> | null = null;
+  const tease = (on: boolean) => {
+    if (isHappy || smiling) return;
+    tongueWiggle?.stop();
+    tongueWiggle = null;
+    if (on) {
+      animate(tongue, { opacity: 1, scaleY: [0.2, 1.25, 1] }, { duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }).then(() => {
+        if (!reduce && tongue.style.opacity === '1')
+          tongueWiggle = animate(tongue, { scaleY: [1, 1.18, 1], rotate: [0, -6, 6, 0] }, { duration: 0.9, repeat: Infinity, ease: 'easeInOut' });
+      });
+      animate(head, { y: -3 }, spring(0.4, 0.5));
+    } else {
+      animate(tongue, { opacity: 0, scaleY: 0.2 }, { duration: 0.2 });
+      animate(head, { y: 0 }, spring(0.4, 0.6));
+    }
+  };
+  document.querySelectorAll('[data-mascot-tease]').forEach((btn) => {
+    btn.addEventListener('pointerenter', (e) => (e as PointerEvent).pointerType === 'mouse' && tease(true));
+    btn.addEventListener('pointerleave', (e) => (e as PointerEvent).pointerType === 'mouse' && tease(false));
+    btn.addEventListener('focus', () => tease(true));
+    btn.addEventListener('blur', () => tease(false));
+  });
 
   // Teclado: Enter/Espaço faz carinho
   root.tabIndex = 0;
