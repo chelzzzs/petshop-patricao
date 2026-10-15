@@ -27,15 +27,35 @@ document.querySelectorAll<HTMLElement>('[data-flip]').forEach((card) => {
   let hovering = false;
   let drag: { x: number; start: number; last: number; t: number; v: number; moved: boolean; id: number } | null = null;
   let suppressClick = false;
+  let anim: ReturnType<typeof animate> | null = null;
 
+  // Ângulo realmente na tela (no meio de uma animação ele difere do alvo): lê a matriz e "desenrola" perto do alvo
+  const currentAngle = () => {
+    const m = new DOMMatrix(getComputedStyle(inner).transform);
+    const deg = (Math.atan2(-m.m13, m.m11) * 180) / Math.PI;
+    return deg + 360 * Math.round((angle - deg) / 360);
+  };
+  // Para a animação em andamento (senão ela "ganha" do arrasto) e congela no ângulo atual
+  const freeze = () => {
+    if (!anim) return;
+    const a = currentAngle();
+    anim.stop();
+    anim = null;
+    setAngle(a);
+  };
   const setAngle = (a: number) => {
     angle = a;
     inner.style.transform = `rotateY(${a}deg)`;
   };
   const goTo = (target: number) => {
+    freeze();
     const from = angle;
     angle = target;
-    animate(inner, { rotateY: [from, target] }, reduce ? { duration: 0 } : spring(0.35, 0.8));
+    anim = animate(
+      inner,
+      { rotateY: [from, target] },
+      reduce ? { duration: 0 } : { type: 'spring', visualDuration: 0.8, bounce: 0.22 },
+    );
   };
   // Lado mostrado: verso quando fixado ou com o mouse em cima
   const showing = () => (pinned || hovering ? 180 : 0);
@@ -62,6 +82,7 @@ document.querySelectorAll<HTMLElement>('[data-flip]').forEach((card) => {
 
   card.addEventListener('pointerdown', (e) => {
     if ((e.target as Element).closest('a') || e.button > 0) return;
+    freeze();
     drag = { x: e.clientX, start: angle, last: e.clientX, t: performance.now(), v: 0, moved: false, id: e.pointerId };
   });
   card.addEventListener('pointermove', (e) => {
@@ -78,7 +99,7 @@ document.querySelectorAll<HTMLElement>('[data-flip]').forEach((card) => {
     drag.v = (e.clientX - drag.last) / Math.max(1, now - drag.t); // px/ms
     drag.last = e.clientX;
     drag.t = now;
-    setAngle(drag.start + dx * (360 / Math.max(card.clientWidth * 1.6, 1)));
+    setAngle(drag.start + dx * (180 / Math.max(card.clientWidth, 120)));
   });
   const endDrag = () => {
     if (!drag) return;

@@ -73,6 +73,12 @@
   transform: rotateY(180deg);
 }
 
+/* Fundo do hero (shader + patinhas) some aos poucos no fim da seção, sem corte seco */
+.hero-fade {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgb(0 0 0 / 0.5) 78%, transparent 94%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgb(0 0 0 / 0.5) 78%, transparent 94%, transparent 100%);
+}
+
 /* Botão transparente que vira (flip 3D no eixo X) */
 .btn-flip {
   display: inline-block;
