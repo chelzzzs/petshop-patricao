@@ -33,7 +33,6 @@
 @media (prefers-reduced-motion: no-preference) {
   .js [data-hero-item],
   .js [data-hero-logo],
-  .js [data-chip],
   .js [data-reveal],
   .js [data-stagger] > * {
     opacity: 0;
@@ -83,17 +82,59 @@
   transform: rotateY(180deg);
 }
 
+/* Botão transparente que vira (flip 3D no eixo X) */
+.btn-flip {
+  display: inline-block;
+  perspective: 700px;
+  border-radius: 9999px;
+}
+.btn-flip-inner {
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform 0.7s var(--ease-spring);
+}
+.btn-flip-face {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.btn-flip-front {
+  color: var(--color-cream);
+  background: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 0 0 2px rgb(255 247 232 / 0.85);
+}
+.btn-flip-back {
+  color: var(--color-ink);
+  background: var(--color-cream);
+  transform: rotateX(180deg);
+}
+.btn-flip:focus-visible .btn-flip-inner,
+.btn-flip:active .btn-flip-inner {
+  transform: rotateX(180deg);
+}
+
 /* Marquee */
 .marquee-track {
   animation: marquee 40s linear infinite;
   will-change: transform;
+  backface-visibility: hidden;
 }
-.marquee:hover .marquee-track {
+.marquee:hover .marquee-track,
+.marquee[data-offscreen] .marquee-track {
   animation-play-state: paused;
 }
 @keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 

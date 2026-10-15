@@ -34,7 +34,12 @@ const title = `${site.name} · Pet Shop`;
     <meta property="og:locale" content="pt_BR" />
 
     <link rel="preconnect" href="https://images.unsplash.com" />
-    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script is:inline>
+      // Esconde os elementos animados só enquanto o JS de animação carrega. Se ele não rodar em 2,5s
+      // (falha de rede, bloqueio), tira a classe e o conteúdo aparece sem animação.
+      document.documentElement.classList.add('js');
+      setTimeout(() => window.__motionReady || document.documentElement.classList.remove('js'), 2500);
+    </script>
   </head>
   <body>
     <slot />

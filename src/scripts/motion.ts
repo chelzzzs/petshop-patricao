@@ -1,5 +1,7 @@
 import { animate, inView, scroll, stagger } from 'motion';
 
+(window as unknown as { __motionReady: boolean }).__motionReady = true;
+
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const spring = (bounce = 0.3, duration = 0.8) => ({ type: 'spring' as const, bounce, duration });
 
@@ -26,6 +28,14 @@ document.querySelectorAll<HTMLElement>('[data-flip]').forEach((card) => {
   );
 });
 
+// Galeria pausa quando sai da tela (por padrão ela roda; só pausa com confirmação do observer)
+const marquee = document.querySelector<HTMLElement>('[data-marquee]');
+if (marquee) {
+  new IntersectionObserver(([entry]) => marquee.toggleAttribute('data-offscreen', !entry.isIntersecting), {
+    rootMargin: '100px 0px',
+  }).observe(marquee);
+}
+
 if (!reduce) {
   // Entrada do hero
   animate('[data-hero-logo]', { opacity: [0, 1], scale: [0.6, 1], rotate: [-14, 0] }, spring(0.5, 1.1));
@@ -33,11 +43,6 @@ if (!reduce) {
     '[data-hero-item]',
     { opacity: [0, 1], y: [32, 0] },
     { ...spring(0.3, 0.9), delay: stagger(0.09, { startDelay: 0.1 }) },
-  );
-  animate(
-    '[data-chip]',
-    { opacity: [0, 1], scale: [0, 1] },
-    { ...spring(0.55, 0.8), delay: stagger(0.18, { startDelay: 0.7 }) },
   );
 
 
@@ -60,6 +65,26 @@ if (!reduce) {
     },
     { margin: '0px 0px -12% 0px' },
   );
+
+  // Banner final: botão vira (flip no eixo X) com spring no hover; ao aparecer dá uma volta como dica
+  document.querySelectorAll<HTMLElement>('.btn-flip').forEach((btn) => {
+    const inner = btn.querySelector<HTMLElement>('.btn-flip-inner');
+    if (!inner) return;
+    const flip = (deg: number) => animate(inner, { rotateX: deg }, spring(0.45, 0.8));
+    btn.addEventListener('pointerenter', () => flip(180));
+    btn.addEventListener('pointerleave', () => flip(0));
+    btn.addEventListener('focus', () => flip(180));
+    btn.addEventListener('blur', () => flip(0));
+    inView(
+      btn,
+      () => {
+        animate(inner, { rotateX: [0, 360] }, { duration: 1.2, delay: 0.5, ease: [0.34, 1.3, 0.64, 1] }).then(() => {
+          if (!btn.matches(':hover, :focus')) animate(inner, { rotateX: 0 }, { duration: 0 });
+        });
+      },
+      { margin: '0px 0px -15% 0px' },
+    );
+  });
 
   // Frase do "Sobre" acende palavra por palavra
   const words = [...document.querySelectorAll<HTMLElement>('[data-word]')];
@@ -93,7 +118,9 @@ if (!reduce) {
       l.el.style.translate = 'none';
       const r = l.el.getBoundingClientRect();
       l.center = r.top + scrollY + r.height / 2;
-      l.k = mobile.matches ? (l.inHero ? 0 : 0.5) : 1;
+      // No celular: hero e camadas horizontais (galeria) ficam sem parallax — no touch o scroll roda
+      // no compositor e o translate via JS chega 1 quadro atrasado, o que dá o "tremido".
+      l.k = mobile.matches ? (l.inHero || l.sx ? 0 : 0.5) : 1;
       l.el.style.willChange = l.k ? 'translate' : '';
     });
   // Camadas longe da tela não são atualizadas (sem escrita de estilo à toa)

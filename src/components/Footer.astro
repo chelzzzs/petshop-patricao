@@ -1,18 +1,43 @@
 ---
-import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import logo from '../assets/logo.webp';
+import MaskedHeading from './MaskedHeading.astro';
 import { site, whatsappLink } from '../data/site';
 
 const year = new Date().getFullYear();
 ---
 
 <section class="px-4 pb-6 sm:px-6">
-  <div data-reveal class="mx-auto flex max-w-6xl flex-col items-center gap-6 rounded-[2.5rem] bg-sun px-6 py-16 text-center sm:py-20">
-    <Image data-speed style="--speed:-0.15" src={logo} alt="" width={192} height={192} loading="lazy" class="size-24 rounded-full bg-white object-cover ring-4 ring-ink" />
-    <h2 class="font-display text-4xl font-bold tracking-tight text-balance sm:text-6xl">Bora mimar seu patrão?</h2>
-    <a href={whatsappLink()} target="_blank" rel="noopener" class="btn bg-ink px-8 py-4 text-lg text-cream">
-      <Icon name="MessageCircle" /> Chamar no WhatsApp
+  <div data-reveal class="relative isolate mx-auto flex max-w-6xl flex-col items-center gap-6 overflow-hidden rounded-[2.5rem] bg-ink px-6 py-16 text-center text-cream sm:py-24">
+    <img
+      src={site.cta.image.src}
+      srcset={site.cta.image.srcset}
+      sizes="(min-width: 1152px) 1152px, 100vw"
+      alt={site.cta.alt}
+      width="1600"
+      height="1067"
+      loading="lazy"
+      decoding="async"
+      class="absolute inset-0 -z-10 size-full object-cover"
+    />
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink/80 via-ink/45 to-ink/30"></div>
+    <MaskedHeading
+      text={site.cta.title}
+      gradient={site.cta.fill}
+      ratio={0.5}
+      fillScale={1.25}
+      parallax={26}
+      drift={18}
+      duration={1.1}
+      stagger={0.09}
+      brightness={1}
+      saturation={1}
+      class="w-full font-display text-5xl leading-[1.06] font-bold tracking-[-0.03em] text-balance sm:text-7xl"
+    />
+    <a href={whatsappLink()} target="_blank" rel="noopener" class="btn-flip font-display text-lg font-semibold" aria-label="Chamar no WhatsApp">
+      <span class="btn-flip-inner">
+        <span class="btn-flip-face btn-flip-front"><Icon name="MessageCircle" /> Chamar no WhatsApp</span>
+        <span class="btn-flip-face btn-flip-back" aria-hidden="true">Bora conversar <Icon name="ArrowRight" /></span>
+      </span>
     </a>
   </div>
 </section>

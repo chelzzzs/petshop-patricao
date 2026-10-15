@@ -3,12 +3,6 @@ import Icon from './Icon.astro';
 import Mascot from './Mascot.astro';
 import { site, whatsappLink } from '../data/site';
 
-const chips = [
-  { icon: 'Package', label: 'Ração', pos: 'right-[-2%] top-[-2%] md:right-[2%] md:top-[0%]', speed: '-0.12' },
-  { icon: 'Bone', label: 'Petiscos', pos: 'left-[-6%] top-[44%] md:left-[-34%] md:top-[40%]', speed: '0.08' },
-  { icon: 'Volleyball', label: 'Brinquedos', pos: 'right-[-4%] bottom-[0%] md:right-[-30%] md:bottom-[-2%]', speed: '-0.2' },
-];
-
 // Camadas de patinhas ao fundo, cada uma com velocidade própria
 const paws = [
   { pos: 'left-[6%] top-[18%]', size: 'size-10', rot: '-rotate-12', speed: '0.6' },
@@ -56,12 +50,6 @@ const paws = [
           <Mascot />
         </div>
       </div>
-      {chips.map((c) => (
-        <span data-chip data-speed style={`--speed:${c.speed}`} class={`absolute ${c.pos} inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-2 font-display text-sm font-semibold shadow-lg md:px-4 md:py-2.5 md:text-base`}>
-          <span class="grid size-7 place-items-center rounded-xl bg-sun md:size-8"><Icon name={c.icon} class="size-4" /></span>
-          {c.label}
-        </span>
-      ))}
     </div>
   </div>
 

@@ -5,7 +5,7 @@ Tamanho: **Medium** · Status: aprovada (2026-10-14) — esboço inicial, iterat
 ## Identidade
 - **Nome:** PatriCão
 - **Logo:** filhote preto com "joinha" amarelo → `public/logo.webp`
-- **Slogan (placeholder):** "Tudo de patrão pro seu cão."
+- **Slogan (placeholder):** "Tudo de patrão pro seu pet."
 - **Escopo do negócio:** nesta fase **só produtos** (rações, petiscos, brinquedos, acessórios). Sem serviços (banho, tosa, táxi dog).
 - **Paleta (derivada da logo):** preto `#141210`, amarelo joinha `#FFC531`, creme `#FFF7E8`, branco
 - **Tipografia:** Fredoka (títulos), Nunito (corpo)

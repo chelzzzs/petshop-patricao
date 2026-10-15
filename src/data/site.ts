@@ -31,7 +31,7 @@ const unsplash = (id: string, ratio: number, widths: number[]): Img => ({
 
 export const site = {
   name: 'PatriCão',
-  tagline: 'Tudo de patrão pro seu cão.',
+  tagline: 'Tudo de patrão pro seu pet.',
   subline: 'Ração, petiscos e brinquedos pra quem é da família.',
   description:
     'PatriCão Pet Shop: rações, petiscos, brinquedos e acessórios para cães e gatos. Peça pelo WhatsApp.',
@@ -96,6 +96,14 @@ export const site = {
     { image: unsplash('photo-1560807707-8cc77767d783', 1.28, [260, 420, 560]), alt: 'Filhote de pelo longo' },
     { image: unsplash('photo-1592194996308-7b43878e84a6', 1.28, [260, 420, 560]), alt: 'Gato de pelo longo' },
   ] satisfies Photo[],
+
+  cta: {
+    title: 'Bora mimar seu pet?',
+    image: unsplash('photo-1646640237574-34c1c733f452', 2 / 3, [640, 1024, 1600]),
+    alt: 'Cachorros brancos correndo e brincando em um parque',
+    // Degradê das letras do título nas cores da foto do parque: folhas de outono, luz e grama
+    fill: 'linear-gradient(105deg, #ffd27a 0%, #f2a65a 18%, #fff1d6 36%, #9fcf8f 52%, #d6e6a8 66%, #f2a65a 84%, #ffd27a 100%)',
+  },
 
   about: {
     kicker: 'Sobre a gente',

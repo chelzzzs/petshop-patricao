@@ -30,7 +30,7 @@ void main() {
   float aspect = u_res.x / u_res.y;
   vec2 p = vec2(uv.x * aspect, uv.y);
   vec2 m = vec2(u_mouse.x * aspect, u_mouse.y);
-  float t = u_time * 0.05;
+  float t = u_time * 0.07; // velocidade do fluxo (+40% sobre o 0.05 original)
 
   float glow = exp(-3.0 * length(p - m));
   vec2 q = vec2(fbm(p * 1.4 + t), fbm(p * 1.4 - t + 4.0));

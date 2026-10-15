@@ -1,0 +1,211 @@
+---
+// Título com a foto "dentro" das letras (background-clip: text).
+// Cada palavra sobe de dentro de uma máscara (reveal "rise") e a imagem tem parallax no scroll + leve drift.
+// A imagem é única para o título todo: o script alinha o fundo de cada palavra ao retângulo do título.
+interface Props {
+  text: string;
+  /** URLs da imagem de preenchimento: pequena (celular) e grande (desktop) */
+  src?: { small: string; large: string };
+  /** Alternativa à foto: um gradiente CSS (ex.: linear-gradient(...)) */
+  gradient?: string;
+  /** Proporção do preenchimento (altura / largura) */
+  ratio?: number;
+  /** Quanto a imagem é maior que o título (sobra para parallax/drift) */
+  fillScale?: number;
+  /** Deslocamento máximo da imagem no scroll, em px */
+  parallax?: number;
+  /** Amplitude do movimento contínuo da imagem, em px */
+  drift?: number;
+  duration?: number;
+  stagger?: number;
+  brightness?: number;
+  saturation?: number;
+  tag?: 'h1' | 'h2' | 'h3';
+  class?: string;
+}
+
+const {
+  text,
+  src,
+  gradient,
+  ratio = 0.5,
+  fillScale = 1.25,
+  parallax = 26,
+  drift = 18,
+  duration = 1.1,
+  stagger = 0.09,
+  brightness = 1,
+  saturation = 1,
+  tag: Tag = 'h2',
+  class: className = '',
+} = Astro.props;
+
+const words = text.split(' ');
+---
+
+<Tag
+  data-masked-heading
+  data-src-small={src?.small}
+  data-src-large={src?.large}
+  data-gradient={gradient}
+  data-ratio={ratio}
+  data-fill-scale={fillScale}
+  data-parallax={parallax}
+  data-duration={duration}
+  data-stagger={stagger}
+  aria-label={text}
+  class:list={['masked-heading relative', className]}
+  style={`--mh-drift:${drift}px;--mh-filter:brightness(${brightness}) saturate(${saturation});`}
+>
+  {
+    words.map((w, i) => (
+      <>
+        <span class="mh-mask" aria-hidden="true">
+          <span class="mh-word">{w}</span>
+        </span>
+        {i < words.length - 1 && ' '}
+      </>
+    ))
+  }
+</Tag>
+
+<style>
+  @property --mh-dx {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 0px;
+  }
+
+  .masked-heading {
+    --mh-py: 0px;
+  }
+  /* Cada palavra fica numa "janela" que esconde o que está abaixo da linha (para o rise) */
+  .mh-mask:last-of-type {
+    margin-right: 0;
+  }
+  .mh-mask {
+    display: inline-block;
+    margin-right: 0.2em;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .mh-word {
+    display: inline-block;
+    color: var(--color-cream);
+  }
+  /* Com JS: as letras viram janela para a foto */
+  :global(.js) .masked-heading[data-ready] .mh-word {
+    color: transparent;
+    background-image: var(--mh-img);
+    background-repeat: no-repeat;
+    background-size: var(--mh-w) var(--mh-h);
+    background-position: calc(var(--bx) + var(--mh-dx)) calc(var(--by) + var(--mh-py));
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: var(--mh-filter) drop-shadow(0 2px 10px rgb(20 18 16 / 0.35));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .masked-heading[data-ready] {
+      animation: mh-drift var(--mh-drift-dur, 9s) ease-in-out infinite alternate;
+    }
+    :global(.js) .masked-heading:not([data-revealed]) .mh-word {
+      transform: translateY(110%);
+    }
+  }
+  @keyframes mh-drift {
+    from {
+      --mh-dx: calc(var(--mh-drift) * -1);
+    }
+    to {
+      --mh-dx: var(--mh-drift);
+    }
+  }
+</style>
+
+<script>
+  import { animate, inView, scroll, stagger } from 'motion';
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = matchMedia('(max-width: 767px)');
+
+  document.querySelectorAll<HTMLElement>('[data-masked-heading]').forEach((el) => {
+    const masks = [...el.querySelectorAll<HTMLElement>('.mh-mask')];
+    const words = masks.map((m) => m.querySelector<HTMLElement>('.mh-word')!);
+    const ratio = Number(el.dataset.ratio);
+    const isGradient = !!el.dataset.gradient;
+    // Gradiente é suave: precisa ser bem maior que o título e "passear" bastante para o movimento aparecer
+    const fill = isGradient ? 2.6 : Number(el.dataset.fillScale);
+    const parallax = Number(el.dataset.parallax);
+
+    // Alinha o fundo de cada palavra ao retângulo do título (como se fosse uma imagem só)
+    const layout = () => {
+      const W = el.clientWidth;
+      const H = el.clientHeight;
+      let w = W * fill;
+      let h = w * ratio;
+      if (h < H * fill) {
+        h = H * fill;
+        w = h / ratio;
+      }
+      const ox = (w - W) / 2;
+      const oy = (h - H) / 2;
+      el.style.setProperty(
+        '--mh-img',
+        el.dataset.gradient || `url("${w > 700 ? el.dataset.srcLarge : el.dataset.srcSmall}")`,
+      );
+      el.style.setProperty('--mh-w', `${w.toFixed(1)}px`);
+      el.style.setProperty('--mh-h', `${h.toFixed(1)}px`);
+      if (isGradient) {
+        el.style.setProperty('--mh-drift', `${(ox * 0.9).toFixed(1)}px`);
+        el.style.setProperty('--mh-drift-dur', '6s');
+      }
+      masks.forEach((m, i) => {
+        words[i].style.setProperty('--bx', `${(-m.offsetLeft - ox).toFixed(1)}px`);
+        words[i].style.setProperty('--by', `${(-m.offsetTop - oy).toFixed(1)}px`);
+      });
+      el.toggleAttribute('data-ready', true);
+    };
+    layout();
+    let t = 0;
+    addEventListener('resize', () => {
+      clearTimeout(t);
+      t = window.setTimeout(layout, 150);
+    });
+    document.fonts?.ready.then(layout);
+
+    if (reduce) {
+      el.toggleAttribute('data-revealed', true);
+      return;
+    }
+
+    // Reveal "rise": palavras sobem de dentro da máscara, em sequência
+    inView(
+      el,
+      () => {
+        animate(
+          words,
+          { y: ['110%', '0%'] },
+          {
+            duration: Number(el.dataset.duration),
+            delay: stagger(Number(el.dataset.stagger)),
+            ease: [0.22, 1, 0.36, 1],
+          },
+        ).then(() => {
+          el.toggleAttribute('data-revealed', true);
+          words.forEach((w) => (w.style.transform = ''));
+        });
+      },
+      { margin: '0px 0px -15% 0px' },
+    );
+
+    // Parallax da imagem dentro das letras (só desktop — no celular o scroll fica livre)
+    if (!mobile.matches) {
+      scroll(
+        (p: number) => el.style.setProperty('--mh-py', `${((p - 0.5) * 2 * parallax).toFixed(1)}px`),
+        { target: el, offset: ['start end', 'end start'] },
+      );
+    }
+  });
+</script>
