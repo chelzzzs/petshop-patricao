@@ -16,16 +16,108 @@ document.querySelectorAll('[data-close-menu]').forEach((a) =>
   a.addEventListener('click', () => document.getElementById('menu')?.hidePopover()),
 );
 
-// Card flip por toque/teclado
+// Card flip (controlado por JS): hover mostra o verso no desktop; clique/toque em qualquer lugar vira e desvira;
+// segurar e arrastar na horizontal gira o card junto com o dedo/mouse e solta no lado mais próximo.
 document.querySelectorAll<HTMLElement>('[data-flip]').forEach((card) => {
-  const toggles = card.querySelectorAll<HTMLButtonElement>('[data-flip-toggle]');
-  toggles.forEach((btn) =>
-    btn.addEventListener('click', () => {
-      const flipped = card.classList.toggle('is-flipped');
-      toggles[0].setAttribute('aria-expanded', String(flipped));
-      if (!flipped) toggles[0].focus({ preventScroll: true });
-    }),
-  );
+  const inner = card.querySelector<HTMLElement>('.flip-inner')!;
+  const toggle = card.querySelector<HTMLButtonElement>('[data-flip-toggle]');
+  const hoverable = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  let angle = 0; // ângulo atual (graus)
+  let pinned = false; // virado por clique/toque/arrasto
+  let hovering = false;
+  let drag: { x: number; start: number; last: number; t: number; v: number; moved: boolean; id: number } | null = null;
+  let suppressClick = false;
+
+  const setAngle = (a: number) => {
+    angle = a;
+    inner.style.transform = `rotateY(${a}deg)`;
+  };
+  const goTo = (target: number) => {
+    const from = angle;
+    angle = target;
+    animate(inner, { rotateY: [from, target] }, reduce ? { duration: 0 } : spring(0.35, 0.8));
+  };
+  // Lado mostrado: verso quando fixado ou com o mouse em cima
+  const showing = () => (pinned || hovering ? 180 : 0);
+  // Vai para o ângulo do lado desejado mais próximo do ângulo atual (evita voltas extras)
+  const settle = () => {
+    const side = showing();
+    const k = Math.round((angle - side) / 360);
+    goTo(side + k * 360);
+    toggle?.setAttribute('aria-expanded', String(side === 180));
+  };
+
+  if (hoverable) {
+    card.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      hovering = true;
+      if (!drag) settle();
+    });
+    card.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      hovering = false;
+      if (!drag) settle();
+    });
+  }
+
+  card.addEventListener('pointerdown', (e) => {
+    if ((e.target as Element).closest('a') || e.button > 0) return;
+    drag = { x: e.clientX, start: angle, last: e.clientX, t: performance.now(), v: 0, moved: false, id: e.pointerId };
+  });
+  card.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.moved && Math.abs(dx) < 6) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      try {
+        card.setPointerCapture(e.pointerId);
+      } catch {}
+    }
+    const now = performance.now();
+    drag.v = (e.clientX - drag.last) / Math.max(1, now - drag.t); // px/ms
+    drag.last = e.clientX;
+    drag.t = now;
+    setAngle(drag.start + dx * (360 / Math.max(card.clientWidth * 1.6, 1)));
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    if (drag.moved) {
+      suppressClick = true;
+      // Projeta um pouco na direção do gesto e fica com o lado (frente/verso) mais próximo
+      const projected = angle + Math.max(-90, Math.min(90, drag.v * 140));
+      const half = Math.round(projected / 180);
+      pinned = Math.abs(half) % 2 === 1;
+      goTo(half * 180);
+      toggle?.setAttribute('aria-expanded', String(pinned));
+    }
+    drag = null;
+  };
+  card.addEventListener('pointerup', endDrag);
+  card.addEventListener('pointercancel', endDrag);
+
+  card.addEventListener('click', (e) => {
+    if (suppressClick) {
+      suppressClick = false;
+      return;
+    }
+    if ((e.target as Element).closest('a')) return;
+    pinned = !(pinned || hovering);
+    if (!pinned) hovering = false;
+    settle();
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pinned) {
+      pinned = false;
+      settle();
+      toggle?.focus({ preventScroll: true });
+    }
+  });
+  // Foco de teclado no link do verso mostra o verso
+  card.querySelector('a')?.addEventListener('focus', () => {
+    pinned = true;
+    settle();
+  });
 });
 
 // Galeria pausa quando sai da tela (por padrão ela roda; só pausa com confirmação do observer)

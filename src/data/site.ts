@@ -107,7 +107,7 @@ export const site = {
 
   about: {
     kicker: 'Sobre a gente',
-    statement: 'Aqui todo cão é tratado como patrão: ração boa, petisco gostoso e brinquedo novo.',
+    statement: 'Aqui todo pet é tratado como patrão: ração boa, petisco gostoso e brinquedo novo.',
     image: unsplash('photo-1632498301446-5f78baad40d0', 1.25, [420, 640, 860]),
     alt: 'Mulher dando um beijo na bochecha do seu cachorro',
   },

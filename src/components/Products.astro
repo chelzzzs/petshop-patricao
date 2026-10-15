@@ -6,15 +6,15 @@ import { site, whatsappLink } from '../data/site';
 <section id="produtos" class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 md:py-32">
   <div data-reveal class="mb-8 flex sm:mb-12 flex-col items-center gap-3 text-center">
     <h2 class="font-display text-4xl font-bold tracking-tight sm:text-5xl">O que tem aqui</h2>
-    <p class="text-ink-soft"><span class="hidden sm:inline">Passe o mouse ou toque no card.</span><span class="sm:hidden">Toque no card.</span></p>
+    <p class="text-ink-soft"><span class="hidden sm:inline">Passe o mouse, clique ou arraste o card.</span><span class="sm:hidden">Toque ou arraste o card para girar.</span></p>
   </div>
 
   <ul data-stagger class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
     {site.products.map((s, i) => (
-      <li class="flip group aspect-[3/4]" data-flip data-speed style={`--speed:${i % 2 ? -0.08 : 0.04}`}>
+      <li class="flip group aspect-[3/4] cursor-grab touch-pan-y select-none active:cursor-grabbing" data-flip data-speed style={`--speed:${i % 2 ? -0.08 : 0.04}`}>
         <div class="flip-inner">
           <div class="flip-face bg-ink">
-            <img src={s.image.src} srcset={s.image.srcset} sizes="(min-width: 1024px) 270px, 46vw" alt={s.alt} width="700" height="900" loading="lazy" decoding="async" class="size-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" />
+            <img draggable="false" src={s.image.src} srcset={s.image.srcset} sizes="(min-width: 1024px) 270px, 46vw" alt={s.alt} width="700" height="900" loading="lazy" decoding="async" class="size-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent"></div>
             <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-cream sm:p-5">
               <h3 class="font-display text-xl font-bold sm:text-3xl">{s.title}</h3>
@@ -30,13 +30,10 @@ import { site, whatsappLink } from '../data/site';
               <p class="mt-1 text-sm leading-snug sm:mt-2 sm:text-lg">{s.text}</p>
               {s.price && <p class="mt-2 font-display text-sm font-semibold sm:mt-3 sm:text-base">{s.price}</p>}
             </div>
-            <div class="flex items-center justify-between gap-2">
-              <a href={whatsappLink(`Oi, PatriCão! Quero saber sobre ${s.title.toLowerCase()} 🐾`)} target="_blank" rel="noopener" class="btn bg-ink px-3 py-2 text-xs text-cream sm:px-5 sm:py-2.5 sm:text-sm">
+            <div>
+              <a href={whatsappLink(`Oi, PatriCão! Quero saber sobre ${s.title.toLowerCase()} 🐾`)} target="_blank" rel="noopener" draggable="false" class="btn bg-ink px-3 py-2 text-xs text-cream sm:px-5 sm:py-2.5 sm:text-sm">
                 Pedir <Icon name="ArrowRight" class="size-4" />
               </a>
-              <button type="button" data-flip-toggle class="grid size-8 shrink-0 place-items-center rounded-full ring-2 ring-ink sm:size-10" aria-label="Voltar">
-                <Icon name="X" class="size-4" />
-              </button>
             </div>
           </div>
         </div>

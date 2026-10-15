@@ -9,6 +9,7 @@ precision mediump float;
 uniform vec2 u_res;
 uniform float u_time;
 uniform vec2 u_mouse;
+uniform float u_boost; // 0 = desktop, 1 = celular (cores mais fortes e padrão mais denso)
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
@@ -28,8 +29,8 @@ float fbm(vec2 p) {
 void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
   float aspect = u_res.x / u_res.y;
-  vec2 p = vec2(uv.x * aspect, uv.y);
-  vec2 m = vec2(u_mouse.x * aspect, u_mouse.y);
+  vec2 p = vec2(uv.x * aspect, uv.y) * mix(1.0, 1.7, u_boost);
+  vec2 m = vec2(u_mouse.x * aspect, u_mouse.y) * mix(1.0, 1.7, u_boost);
   float t = u_time * 0.07; // velocidade do fluxo (+40% sobre o 0.05 original)
 
   float glow = exp(-3.0 * length(p - m));
@@ -40,10 +41,11 @@ void main() {
   vec3 sun   = vec3(1.0, 0.773, 0.192);
   vec3 deep  = vec3(0.949, 0.663, 0.0);
 
-  vec3 col = mix(cream, sun, smoothstep(0.38, 0.82, n));
-  col = mix(col, deep, smoothstep(0.72, 1.0, n) * 0.4);
-  col = mix(col, cream, smoothstep(0.55, 0.0, uv.x) * 0.45);
-  col += glow * 0.06;
+  vec3 col = mix(cream, sun, smoothstep(0.38 - 0.1 * u_boost, 0.82 - 0.14 * u_boost, n));
+  col = mix(col, deep, smoothstep(0.72 - 0.1 * u_boost, 1.0, n) * (0.4 + 0.25 * u_boost));
+  // No desktop o texto fica à esquerda: clareia esse lado. No celular o layout é centralizado.
+  col = mix(col, cream, smoothstep(0.55, 0.0, uv.x) * 0.45 * (1.0 - u_boost));
+  col += glow * (0.06 + 0.06 * u_boost);
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -85,6 +87,7 @@ export function mountShader(canvas: HTMLCanvasElement) {
   const uRes = gl.getUniformLocation(program, 'u_res');
   const uTime = gl.getUniformLocation(program, 'u_time');
   const uMouse = gl.getUniformLocation(program, 'u_mouse');
+  const uBoost = gl.getUniformLocation(program, 'u_boost');
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mouse = { x: 0.7, y: 0.5, tx: 0.7, ty: 0.5 };
@@ -96,7 +99,8 @@ export function mountShader(canvas: HTMLCanvasElement) {
 
   // O gradiente é suave: renderizar abaixo da resolução da tela e deixar o navegador ampliar
   // custa uma fração dos pixels sem diferença visível. No celular, menos ainda.
-  const scale = matchMedia('(max-width: 767px), (pointer: coarse)').matches ? 0.3 : 0.5;
+  const isMobile = matchMedia('(max-width: 767px), (pointer: coarse)').matches;
+  const scale = isMobile ? 0.3 : 0.5;
   const FRAME_MS = 1000 / 30;
 
   const resize = () => {
@@ -108,11 +112,18 @@ export function mountShader(canvas: HTMLCanvasElement) {
   };
 
   const draw = (now: number) => {
+    // Sem mouse no celular: o brilho passeia sozinho pela tela
+    if (isMobile) {
+      const s = (now - start) / 1000;
+      mouse.tx = 0.5 + 0.35 * Math.sin(s * 0.45);
+      mouse.ty = 0.5 + 0.3 * Math.sin(s * 0.31 + 1.3);
+    }
     mouse.x += (mouse.tx - mouse.x) * 0.05;
     mouse.y += (mouse.ty - mouse.y) * 0.05;
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.uniform1f(uTime, reduce ? 20 : (now - start) / 1000);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.uniform1f(uBoost, isMobile ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
 
