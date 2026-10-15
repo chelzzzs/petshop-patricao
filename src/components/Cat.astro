@@ -1,0 +1,68 @@
+---
+// Gatinho branco, parceiro do PatriCão. Mesmas camadas (data-*) do Mascot.astro,
+// então o mesmo script (mascot.ts) dá vida a ele: olhos/cabeça seguem o mouse, pisca, respira,
+// clique na cabeça = sorriso, segurar o focinho = feliz.
+const fur = '#fbf8f3';
+const shade = '#e9e2d8';
+const line = '#2b2622';
+const pink = '#ffb3c1';
+
+const eyes = [
+  { cx: 158, cy: 178 },
+  { cx: 242, cy: 178 },
+];
+---
+
+<div class="mascot relative select-none" data-mascot>
+  <svg viewBox="0 0 400 400" class="size-full overflow-visible" role="img" aria-label="Gatinho branco, amigo do PatriCão. Clique na cabeça ou segure no focinho.">
+    <!-- corpo (respiração) -->
+    <g data-body style="transform-box:fill-box;transform-origin:50% 100%">
+      <path d="M124 400C124 326 162 292 200 292S276 326 276 400Z" fill={fur} stroke={line} stroke-width="5" stroke-linejoin="round" />
+      <path d="M176 312Q200 328 224 312" fill="none" stroke={shade} stroke-width="6" stroke-linecap="round" />
+    </g>
+
+    <!-- cabeça -->
+    <g data-head class="cursor-pointer" style="transform-box:fill-box;transform-origin:50% 90%">
+      <g data-ear="l" style="transform-box:fill-box;transform-origin:60% 100%">
+        <path d="M118 156L130 60L192 112Z" fill={fur} stroke={line} stroke-width="5" stroke-linejoin="round" />
+        <path d="M134 134L140 86L174 114Z" fill={pink} />
+      </g>
+      <g data-ear="r" style="transform-box:fill-box;transform-origin:40% 100%">
+        <path d="M282 156L270 60L208 112Z" fill={fur} stroke={line} stroke-width="5" stroke-linejoin="round" />
+        <path d="M266 134L260 86L226 114Z" fill={pink} />
+      </g>
+
+      <ellipse data-pat cx="200" cy="184" rx="102" ry="86" fill={fur} stroke={line} stroke-width="5" />
+      <!-- listrinhas suaves na testa -->
+      <path d="M186 104Q190 122 184 134M200 100V130M214 104Q210 122 216 134" fill="none" stroke={shade} stroke-width="6" stroke-linecap="round" />
+
+      {eyes.map((e) => (
+        <g>
+          <ellipse cx={e.cx} cy={e.cy} rx="25" ry="27" fill="#8fd3f4" stroke={line} stroke-width="3" />
+          <g data-eye style="transform-box:fill-box;transform-origin:50% 50%">
+            <circle cx={e.cx} cy={e.cy} r="16" fill="#1d1a18" />
+            <circle cx={e.cx - 6} cy={e.cy - 7} r="6" fill="#fff" />
+            <circle cx={e.cx + 6} cy={e.cy + 6} r="2.5" fill="#fff" opacity=".85" />
+          </g>
+          <ellipse data-lid cx={e.cx} cy={e.cy} rx="28" ry="30" fill={fur} style="transform-box:fill-box;transform-origin:50% 0%;transform:scaleY(0)" />
+          <path data-happy d={`M${e.cx - 14} ${e.cy + 4}Q${e.cx} ${e.cy - 14} ${e.cx + 14} ${e.cy + 4}`} fill="none" stroke={line} stroke-width="6" stroke-linecap="round" opacity="0" />
+        </g>
+      ))}
+
+      <ellipse data-blush cx="130" cy="214" rx="15" ry="8" fill="#ff9aa8" opacity="0" />
+      <ellipse data-blush cx="270" cy="214" rx="15" ry="8" fill="#ff9aa8" opacity="0" />
+
+      <!-- bigodes -->
+      <path d="M152 210L104 200M152 220L102 222M248 210L296 200M248 220L298 222" fill="none" stroke={line} stroke-width="2.5" stroke-linecap="round" opacity=".6" />
+
+      <g data-chin class="cursor-grab">
+        <ellipse cx="200" cy="218" rx="40" ry="26" fill="#fffdf9" />
+        <path d="M189 204H211L200 216Z" fill="#ff9fb0" stroke={line} stroke-width="3" stroke-linejoin="round" />
+        <path data-tongue d="M194 228Q200 242 206 228Z" fill="#ff7a8a" opacity="0" style="transform-box:fill-box;transform-origin:50% 0%" />
+        <path d="M200 216V222M200 222Q191 232 183 224M200 222Q209 232 217 224" fill="none" stroke={line} stroke-width="3.5" stroke-linecap="round" />
+      </g>
+    </g>
+
+    <g data-fx></g>
+  </svg>
+</div>

@@ -12,7 +12,7 @@ export function mountMascot(root: HTMLElement) {
   const chin = $('[data-chin]');
   const body = $('[data-body]');
   const fx = $('[data-fx]');
-  const hints = $('[data-hints]');
+  const hints = root.querySelector<SVGGElement>('[data-hints]'); // só o cachorro tem dicas
   const eyes = $$('[data-eye]');
   const lids = $$('[data-lid]');
   const happy = $$('[data-happy]');
@@ -65,7 +65,7 @@ export function mountMascot(root: HTMLElement) {
     );
   }
 
-  const dismissHints = () => animate(hints, { opacity: 0 }, { duration: 0.4 });
+  const dismissHints = () => hints && animate(hints, { opacity: 0 }, { duration: 0.4 });
 
   const heart = (x: number, y: number) => {
     const use = document.createElementNS(SVG_NS, 'use');

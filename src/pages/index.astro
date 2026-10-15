@@ -29,6 +29,5 @@ import Footer from '../components/Footer.astro';
   const canvas = document.querySelector<HTMLCanvasElement>('[data-shader]');
   if (canvas) mountShader(canvas);
 
-  const mascot = document.querySelector<HTMLElement>('[data-mascot]');
-  if (mascot) mountMascot(mascot);
+  document.querySelectorAll<HTMLElement>('[data-mascot]').forEach(mountMascot);
 </script>

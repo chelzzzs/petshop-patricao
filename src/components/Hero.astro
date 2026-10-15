@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import Mascot from './Mascot.astro';
+import Cat from './Cat.astro';
 import { site, whatsappLink } from '../data/site';
 
 // Camadas de patinhas ao fundo, cada uma com velocidade própria
@@ -47,10 +48,16 @@ const paws = [
       </div>
     </div>
 
-    <div data-speed style="--speed:0.45" class="relative mx-auto w-full max-w-[18rem] md:max-w-sm">
-      <div data-hero-logo>
+    <!-- Cachorro + gatinho (menor, à direita, um pouco sobreposto) -->
+    <div data-speed style="--speed:0.45" class="relative mx-auto flex w-full max-w-[24rem] items-end md:max-w-[34rem]">
+      <div data-hero-logo class="relative z-10 w-[66%]">
         <div class="float relative aspect-square">
           <Mascot />
+        </div>
+      </div>
+      <div data-hero-logo class="relative -ml-[20%] w-[42%]">
+        <div class="float relative aspect-square [animation-delay:-2.5s]">
+          <Cat />
         </div>
       </div>
     </div>
